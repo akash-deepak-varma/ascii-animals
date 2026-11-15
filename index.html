@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>ascii animals</title>
-    <script>
-      // Only Chromium can run an SVG filter inside backdrop-filter; everyone else gets frosted glass.
-      if (/Chrome\//.test(navigator.userAgent)) document.documentElement.classList.add("liquid");
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/page.css" />
+    <meta name="color-scheme" content="dark" />
+    <title>New Tab</title>
+    <!-- Dark from the first paint, before page.css arrives. -->
+    <style>html, body { background: #06070c; }</style>
+    <!-- Only Chromium can run an SVG filter inside backdrop-filter; everyone else gets frosted glass.
+         An external file, because extension pages forbid inline scripts. -->
+    <script src="./liquid-detect.js"></script>
+    <link rel="stylesheet" href="./page.css" />
   </head>
   <body>
     <canvas aria-hidden="true"></canvas>
@@ -29,34 +29,28 @@
     </div>
 
     <main class="stage">
-      <!-- Dia's mark, cut out of a screenshot (a concept redesign, not affiliated with Dia). -->
+      <!-- The logo is a placeholder mark cut out of a screenshot; swap public/dia-logo.png for your own. -->
       <div class="masthead">
-        <div class="logo" role="img" aria-label="Dia"></div>
-        <h1 class="greeting">Hello, Stephen</h1>
+        <div class="logo" role="img" aria-label="ASCII Animals"></div>
+        <h1 class="greeting"></h1>
       </div>
-      <form class="composer glass" autocomplete="off">
+      <form class="composer glass" autocomplete="off" role="search">
         <div class="composer-field">
           <svg class="composer-search" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <circle cx="10.5" cy="10.5" r="6.5" />
             <path d="m15.5 15.5 5 5" />
           </svg>
-          <textarea name="prompt" rows="1" placeholder="Ask anything..." aria-label="Ask anything"></textarea>
+          <textarea name="prompt" rows="1" placeholder="Search the web or type a URL" aria-label="Search the web or type a URL"></textarea>
         </div>
         <div class="composer-bar">
-          <button type="button" class="pill">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span>Add tabs or files</span>
-          </button>
           <div class="tools">
-            <button type="button" class="icon-btn" aria-label="Voice input">
+            <button type="button" class="icon-btn voice" aria-label="Voice search">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="9" y="3" width="6" height="11" rx="3" />
                 <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
               </svg>
             </button>
-            <button type="submit" class="send" aria-label="Send" disabled>
+            <button type="submit" class="send" aria-label="Search" disabled>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 19V5M5 12l7-7 7 7" />
               </svg>
@@ -64,8 +58,9 @@
           </div>
         </div>
       </form>
+      <nav class="shortcuts" aria-label="Shortcuts" hidden></nav>
     </main>
 
-    <script type="module" src="/demo.ts"></script>
+    <script type="module" src="./demo.ts"></script>
   </body>
 </html>

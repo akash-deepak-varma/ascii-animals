@@ -1,6 +1,17 @@
-# ascii animals
+# ascii animals: New Tab
 
-Animals drawn as ASCII on a canvas, crossing the screen along one course. Zero dependencies.
+A Chrome extension that replaces your New Tab page with a live scene: animals drawn as ASCII on a canvas, crossing the screen along one course, with a glass search box in the middle. The animal engine has no runtime dependencies.
+
+## Install (unpacked)
+
+```sh
+npm install
+npm run build
+```
+
+Then open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick the `dist/` folder. Open a new tab.
+
+A Chrome *theme* can only hold still images and colours, so it cannot animate or react to clicks; a New Tab extension can, which is why this is one.
 
 Pick one from the row of animals in the top bar. Dark mode only, and each animal has its own colour:
 
@@ -19,19 +30,26 @@ Everywhere:
 - smaller ones are farther away: they move slower and fade into the background
 - whoever leaves downstream comes back in upstream
 - **click** to startle the ones nearby (each animal reacts its own way)
-- the last animal picked is remembered between visits
-- a liquid-glass chat input in the middle, a concept redesign after Dia's AI input (not affiliated with Dia):
-  Dia's dome (`public/dia-logo.png`, cut out of a screenshot) and a greeting by the time of day
-  ("Still up, Stephen?" after 10pm) above it, then "Ask anything...",
-  "Add tabs or files", voice and send (UI only: Enter fires a `chat:submit` event on the form with `{ text }`); the refraction
-  uses an SVG filter in Chromium and falls back to frosted glass elsewhere
+- the last animal picked is remembered between visits (in `chrome.storage`)
+- a liquid-glass **search box** in the middle (a concept redesign after Dia's AI input, not affiliated with Dia):
+  type a search and Enter runs it through your browser's default search engine, type an address and it opens that;
+  the mic button does voice search where the browser supports it. Above it, a greeting by the time of day;
+  the refraction uses an SVG filter in Chromium and falls back to frosted glass elsewhere
 - a **Tweaks** panel (top right): shared Movement and Look sliders plus each animal's own,
   saved per animal; double-click a label to reset it, **Copy** exports what you changed as JSON
 
-```sh
-npm install && npm run dev
-```
+Optional extras, all off until you turn them on in **Settings** (the gear, top right; also the extension's Options page):
 
+| Setting | What it does |
+|---|---|
+| Name | adds your name to the greeting ("Good morning, Sam"); empty leaves it out |
+| Show greeting / search box | hide either one |
+| Shortcuts | a row of tiles under the search box: your top sites or your bookmarks bar. Chrome asks for permission only when you pick one |
+| Auto-rotate | a different animal on each new tab, or every few minutes |
+| Power saver | 30 fps at standard resolution, lighter on battery and CPU |
+| Sync across devices | keeps your animal, tweaks and settings the same on every Chrome you're signed in to (`chrome.storage.sync`) |
+
+For development, `npm run dev` runs the page in a normal browser tab (settings then use `localStorage`, and there's no Chrome search or shortcuts), and `npm run typecheck` checks the types.
 `?animal=koi` picks an animal, `?count=60` pins how many.
 
 ```ts
@@ -50,26 +68,14 @@ engine.set("density", 2);
   silhouettes, line glyphs, dots, the trail)
 - `src/animals/*.ts`: one file per animal: its behaviour, shape, paint and its own knobs
 - `src/engine.ts`: the loop, resizing, input and switching animals
+- `store.ts`: settings storage (`chrome.storage.local` or `.sync`, `localStorage` outside Chrome)
+- `settings.ts`, `shortcuts.ts`, `ui.ts`, `panel.ts`, `demo.ts`: the page around the scene: Settings, shortcut tiles, search box and greeting, Tweaks panel, and the startup that ties them together
+- `public/manifest.json`: the extension manifest (Manifest V3; permissions `storage` and `search`, optional `topSites` and `bookmarks`)
 
-## Publishing to Pocket Studio
+## Before publishing to the Chrome Web Store
 
-It's live at [pocketstudio.design/ascii-animals-app](https://pocketstudio.design/ascii-animals-app/index.html),
-as a static build inside the studio site ([Sumin-Studio/Studio-site](https://github.com/Sumin-Studio/Studio-site)),
-next to the butterflies app. To update it, build with the site's path as the base, straight into
-the site's `public/` (here with Studio-site checked out next to this repo):
-
-```sh
-npx vite build --base=/ascii-animals-app/ --outDir ../Studio-site/public/ascii-animals-app --emptyOutDir
-cp LICENSE ../Studio-site/public/ascii-animals-app/
-```
-
-Then commit that in Studio-site and open a PR. Its Pocket Labs card (image, description, the
-"Try it out" link) is the `ascii-animals` entry in `components/pocket-labs-data.ts`, with its
-images in `public/labs/ascii-animals*`. If a squash merge's production build is blocked because
-Vercel doesn't recognise the commit's email, push an empty "Trigger production deploy" commit
-to `main` from an email on the Vercel team.
-
-The app keeps its settings in localStorage under `ascii-animals:` keys, so it doesn't pick up
-the butterflies app's on the same domain.
+- Replace `public/dia-logo.png` (cut from a screenshot of Dia's mark) and the "after Dia" wording above with your own mark: the store rejects other companies' branding.
+- Replace the generated icons in `public/icons/` (`npm run icons` redraws the defaults) and add store screenshots and a promo tile.
+- The extension collects and sends nothing: settings stay in `chrome.storage` (and Chrome's own sync, if you turn it on). Say so in the privacy policy, and justify `search` (runs your searches), `storage`, and the optional `topSites` and `bookmarks` (the shortcut tiles).
 
 Built on the engine and renderer from [ascii-sharks](https://github.com/stackedlol/ascii-sharks). MIT

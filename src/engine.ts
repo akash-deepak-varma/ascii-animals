@@ -7,6 +7,8 @@ const STEP = 1 / 60;
 /** A built-in animal by name, or any Animal definition. */
 const resolve = (animal: AnimalKey | Animal<any>) => (typeof animal === "string" ? ANIMALS[animal] : animal);
 const MAX_STEPS = 4;
+/** Power saver draws at most every 1/30 s. */
+const FRAME_MS_SAVER = 1000 / 30;
 
 /**
  * Wires a Flock + AsciiRenderer to a canvas: fixed-timestep loop, resize,
@@ -24,6 +26,10 @@ export class AnimalEngine {
   private last = 0;
   private acc = 0;
   private visible = true;
+  /** The page is in a background tab: nothing to draw. */
+  private pageHidden = typeof document !== "undefined" && document.hidden;
+  /** Power saver: render at 1x and no faster than 30 fps. */
+  private powerSaver = false;
   private reducedMotion: MediaQueryList;
   private resizeObserver: ResizeObserver;
   private intersectionObserver: IntersectionObserver;
@@ -59,6 +65,7 @@ export class AnimalEngine {
 
     this.reducedMotion.addEventListener("change", this.onMotionPreference);
     window.addEventListener("pointerdown", this.onPointerDown, { passive: true });
+    document.addEventListener("visibilitychange", this.onVisibility);
 
     this.resize();
     // Canvas text can't trigger a webfont load; once the mono face is in, redraw.
@@ -75,6 +82,14 @@ export class AnimalEngine {
     this.intersectionObserver.disconnect();
     this.reducedMotion.removeEventListener("change", this.onMotionPreference);
     window.removeEventListener("pointerdown", this.onPointerDown);
+    document.removeEventListener("visibilitychange", this.onVisibility);
+  }
+
+  /** Lighter on battery and CPU: renders at 1x resolution and caps the frame rate at 30 fps. */
+  setPowerSaver(on: boolean) {
+    if (this.powerSaver === on) return;
+    this.powerSaver = on;
+    this.resize();
   }
 
   /** Swap in another animal with its own defaults (plus any overrides); the screen fills with it at once. */
@@ -101,7 +116,7 @@ export class AnimalEngine {
   private resize() {
     const rect = this.canvas.getBoundingClientRect();
     if (rect.width < 1 || rect.height < 1) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, this.powerSaver ? 1 : 2);
     this.renderer.resize(rect.width, rect.height, dpr);
     this.flock.resize(rect.width, rect.height);
     if (this.reducedMotion.matches) this.drawStill();
@@ -109,12 +124,17 @@ export class AnimalEngine {
 
   private schedule() {
     cancelAnimationFrame(this.raf);
-    if (this.disposed || !this.visible || this.reducedMotion.matches) return;
+    if (this.disposed || !this.visible || this.pageHidden || this.reducedMotion.matches) return;
     this.last = performance.now();
     this.raf = requestAnimationFrame(this.frame);
   }
 
   private frame = (now: number) => {
+    // Power saver: skip this frame (leaving `last` alone, so the time carries over to the next one).
+    if (this.powerSaver && now - this.last < FRAME_MS_SAVER - 2) {
+      this.raf = requestAnimationFrame(this.frame);
+      return;
+    }
     const dt = Math.min(0.1, (now - this.last) / 1000);
     this.last = now;
     this.acc += dt;
@@ -136,6 +156,12 @@ export class AnimalEngine {
     }
     this.renderer.render(this.flock, STEP);
   }
+
+  private onVisibility = () => {
+    this.pageHidden = document.hidden;
+    if (this.pageHidden) cancelAnimationFrame(this.raf);
+    else this.schedule();
+  };
 
   private onMotionPreference = () => {
     if (this.reducedMotion.matches) {

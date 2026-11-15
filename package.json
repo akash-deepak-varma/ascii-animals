@@ -1,5 +1,5 @@
 {
-  "name": "ascii-animals",
+  "name": "ascii-animals-newtab",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -8,9 +8,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/make-icons.mjs"
   },
   "devDependencies": {
+    "@fontsource/geist": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
+    "@types/chrome": "^0.3.7",
     "typescript": "^5.6.0",
     "vite": "^6.0.0"
   }

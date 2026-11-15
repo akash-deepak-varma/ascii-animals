@@ -1,8 +1,9 @@
 /**
  * Tweak panel: a scene's engine knobs plus the chat glass, as live sliders.
- * Changes persist in localStorage; Copy exports what differs from the
+ * Changes persist through the store (chrome.storage); Copy exports what differs from the
  * defaults as JSON, ready to bake in.
  */
+import { store } from "./store";
 
 const GLASS_DEFAULTS = {
   /** Frost behind the chat input, px. */
@@ -60,14 +61,10 @@ export interface ControlKit<T extends Knobs> {
   toggle(key: keyof T, label: string, hint?: string): Toggle;
 }
 
-const OPEN_KEY = "ascii-animals:tweaks-open";
+const OPEN_KEY = "tweaks-open";
 
 function load<T>(storageKey: string): { tuning?: Partial<T>; glass?: Partial<Glass> } {
-  try {
-    return JSON.parse(localStorage.getItem(storageKey) ?? "{}");
-  } catch {
-    return {};
-  }
+  return store.get(storageKey, {});
 }
 
 /** Only the values that differ from their defaults. */
@@ -120,11 +117,7 @@ export function mountTweakPanel<T extends Knobs>(
   applyGlass(glass);
 
   const save = () => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify({ tuning: changed(t, defaults), glass: changed(glass, GLASS_DEFAULTS) }));
-    } catch {
-      // Storage unavailable: tweaks still apply for this visit.
-    }
+    store.set(storageKey, { tuning: changed(t, defaults), glass: changed(glass, GLASS_DEFAULTS) });
     onChange?.();
   };
 
@@ -296,22 +289,14 @@ export function mountTweakPanel<T extends Knobs>(
     Object.assign(glass, GLASS_DEFAULTS);
     applyGlass(glass);
     refreshAll();
-    try {
-      localStorage.removeItem(storageKey);
-    } catch {
-      // Nothing saved to clear.
-    }
+    store.remove(storageKey);
     onChange?.();
   });
 
   const setOpen = (open: boolean) => {
     panel.hidden = !open;
     opener.hidden = open;
-    try {
-      localStorage.setItem(OPEN_KEY, open ? "1" : "0");
-    } catch {
-      // Not remembered across visits, that's all.
-    }
+    store.set(OPEN_KEY, open);
   };
   close.addEventListener("click", () => {
     hideTip();
@@ -321,13 +306,7 @@ export function mountTweakPanel<T extends Knobs>(
 
   document.body.append(panel, opener, tip);
   // Closed until someone opens it: first-time visitors see the scene, not the knobs.
-  let open = false;
-  try {
-    open = localStorage.getItem(OPEN_KEY) === "1";
-  } catch {
-    // Default to closed.
-  }
-  setOpen(open);
+  setOpen(store.get(OPEN_KEY, false));
 
   return {
     sync() {

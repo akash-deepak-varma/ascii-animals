@@ -1,4 +1,9 @@
-/* Shared page chrome: liquid glass, animal choices, chat composer, tweak panel. */
+/* Shared page chrome: liquid glass, animal choices, search box, shortcuts, tweak and settings panels. */
+
+/* Bundled fonts: a new tab shouldn't wait on (or phone) a font CDN. Geist, SIL Open Font License. */
+@font-face { font-family: Geist; font-weight: 400; font-style: normal; font-display: swap; src: url(/fonts/geist-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: Geist; font-weight: 500; font-style: normal; font-display: swap; src: url(/fonts/geist-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-weight: 600; font-style: normal; font-display: swap; src: url(/fonts/geist-mono-latin-600-normal.woff2) format("woff2"); }
 
 :root {
   --bg: #f6f3ec;
@@ -231,6 +236,7 @@ svg { display: block; }
   --blur: 7px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Geist, system-ui, sans-serif;
 }
+.composer[hidden] { display: none; }
 /* Focused: a faint blue edge and glow, scaled by --edge like the borders. */
 .composer:focus-within {
   border-color: rgba(122, 162, 255, calc(0.3 * var(--edge, 1)));
@@ -263,8 +269,12 @@ svg { display: block; }
   caret-color: var(--dia-text);
 }
 .composer textarea::placeholder { color: var(--dia-muted); }
-.composer-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.composer-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 .tools { display: flex; align-items: center; gap: 10px; }
+.icon-btn[hidden] { display: none; }
+/* Voice search, while it's listening. */
+.icon-btn.listening { color: #ff8a8a; background: rgba(255, 90, 90, 0.14); animation: listen 1.2s ease-in-out infinite; }
+@keyframes listen { 50% { box-shadow: 0 0 0 5px rgba(255, 90, 90, 0.12); } }
 .pill {
   display: inline-flex;
   align-items: center;
@@ -469,21 +479,117 @@ svg { display: block; }
 .liquid .tweaks-open { backdrop-filter: blur(var(--blur)) saturate(180%); }
 .tweaks-open:hover { color: var(--text); }
 
+/* ── shortcuts: glass tiles under the search box ──────────────── */
 
-@media (max-width: 520px) {
-  .pill span { display: none; }
-  .pill { padding: 0 9px; }
+.shortcuts {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 8px;
+  width: min(720px, calc(100vw - 32px));
+  margin-top: 22px;
 }
+.shortcuts[hidden] { display: none; }
+.shortcut {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 88px;
+  padding: 12px 6px 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--glass-edge);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, calc(0.05 * var(--tint, 1)));
+  -webkit-backdrop-filter: blur(var(--blur, 6px)) saturate(160%);
+  backdrop-filter: blur(var(--blur, 6px)) saturate(160%);
+  color: var(--text-soft);
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, translate 0.2s;
+}
+.shortcut:hover { background: var(--chip-hover); color: var(--text); translate: 0 -2px; }
+.shortcut:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.shortcut-badge {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--chip);
+  border: 1px solid var(--chip-edge);
+  font: 600 13px "Geist Mono", ui-monospace, monospace;
+  color: var(--text);
+}
+.shortcut-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Without the search box, the greeting is what's centred. */
+.stage.no-search .masthead { position: static; translate: none; margin-bottom: 0; }
+.stage.no-search .shortcuts { position: static; translate: none; margin: 22px auto 0; }
+
+/* ── settings: same glass as the tweak panel ──────────────────── */
+
+.settings { z-index: 11; }
+.settings-open {
+  top: 16px;
+  right: 108px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--text-soft);
+  cursor: pointer;
+  --blur: 10px;
+}
+.settings-open[hidden] { display: none; }
+/* Tweaks open: the gear steps out to its left (or hides, where the panel is a bottom sheet). */
+body:has(.tweaks:not(.settings):not([hidden])) .settings-open { right: 312px; }
+.liquid .settings-open { backdrop-filter: blur(var(--blur)) saturate(180%); }
+.settings-open:hover { color: var(--text); }
+.settings-select, .settings-text {
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--chip-edge);
+  border-radius: 8px;
+  background: var(--chip);
+  color: var(--text);
+  font: inherit;
+}
+.settings-select { max-width: 150px; }
+.settings-select option { background: #12141f; color: #e8ebf7; }
+.settings-text { width: 150px; }
+.settings-text::placeholder { color: var(--muted); }
+.settings-select:focus-visible, .settings-text:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.settings-select:disabled { opacity: 0.5; }
+.settings-note { margin: 12px 0 0; font-size: 11px; line-height: 1.4; color: #ffb4b4; }
+.settings-note[hidden] { display: none; }
+.tweaks input[type="checkbox"]:disabled { opacity: 0.4; cursor: default; }
+
+
 /*
- * Phones: the animal bar gets the whole top edge (scrolling sideways if it must), so the Tweaks
- * button moves to the bottom right, and the panel opens as a sheet that fits the screen.
+ * Narrow windows: the animal bar gets the whole top edge (scrolling sideways if it must), so the
+ * Tweaks and Settings buttons move to the bottom right, and the panels open as sheets.
  */
 @media (max-width: 720px) {
   .top-bar { top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; translate: none; justify-content: center; }
   .choices { max-width: 100%; }
   .tweaks-open { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); right: 12px; }
+  .settings-open { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); right: 104px; }
+  body:has(.tweaks:not(.settings):not([hidden])) .settings-open { right: 104px; display: none; }
+  .settings { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto; max-height: 70vh; }
   .tweaks { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto; max-height: 70vh; }
+  .shortcut { width: 76px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .glass, .choices .thumb, .choices button, .send, .pill, .icon-btn { transition: none; }
+  .glass, .choices .thumb, .choices button, .send, .icon-btn, .shortcut { transition: none; }
+  .icon-btn.listening { animation: none; }
 }
