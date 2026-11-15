@@ -174,6 +174,17 @@ export function mountSettings({ onChange }: Hooks) {
   device.append(syncRow);
 
   body.append(note);
+
+  // Which build this is, so a bug report can say.
+  const version = typeof chrome !== "undefined" && chrome.runtime?.getManifest ? chrome.runtime.getManifest().version : "dev";
+  const about = el("p", "settings-about");
+  about.append(`Version ${version} · `);
+  const repo = el("a", "", "Feedback and source");
+  repo.href = "https://github.com/akash-deepak-varma/ascii-animals/issues";
+  repo.target = "_blank";
+  repo.rel = "noopener noreferrer";
+  about.append(repo);
+  body.append(about);
   refresh();
 
   // ── open / close ──

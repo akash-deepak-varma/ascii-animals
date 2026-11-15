@@ -2,7 +2,7 @@
  * Page chrome shared by every scene: glass segmented choices, the search box and the greeting.
  */
 /**
- * A greeting by the local time: "Good morning, Stephen" … "Still up, Stephen?" after 10pm.
+ * A greeting by the local time: "Good morning, Sam" … "Still up, Sam?" after 10pm.
  * With no name it's just "Good morning" … "Still up?".
  */
 export function greetingFor(name: string, date = new Date()) {

@@ -159,7 +159,7 @@ svg { display: block; }
   background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--swatch) 50%, white), var(--swatch) 70%);
 }
 
-/* ── logo + chat composer (Dia's AI input layout, in liquid glass) ── */
+/* ── logo + search box (in liquid glass) ── */
 
 /* Shrink-wraps the composer so it stays dead centre; the logo and greeting hang above it. */
 .stage {
@@ -181,17 +181,17 @@ svg { display: block; }
   pointer-events: none;
 }
 /*
- * Dia's dome as glass: whatever swims behind it blurs (and, in Chromium, refracts) through, cut to
- * the logo's exact shape by using the logo itself as the mask, with its brushed texture laid over
- * at partial strength.
+ * The logo as glass: whatever swims behind it blurs (and, in Chromium, refracts) through, cut to
+ * the logo's exact shape by using the logo itself as the mask, with its own colours laid over
+ * at partial strength. Swap public/logo.png for any transparent PNG; the box keeps its shape.
  */
 .logo {
   --logo-texture: 0.62;
   position: relative;
-  width: 76px;
-  aspect-ratio: 159 / 129;
-  -webkit-mask: url(/dia-logo.png) center / contain no-repeat;
-  mask: url(/dia-logo.png) center / contain no-repeat;
+  width: 104px;
+  aspect-ratio: 1;
+  -webkit-mask: url(/logo.png) center / contain no-repeat;
+  mask: url(/logo.png) center / contain no-repeat;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
   -webkit-backdrop-filter: blur(6px) saturate(160%);
   backdrop-filter: blur(6px) saturate(160%);
@@ -201,7 +201,7 @@ svg { display: block; }
   content: "";
   position: absolute;
   inset: 0;
-  background: url(/dia-logo.png) center / contain no-repeat;
+  background: url(/logo.png) center / contain no-repeat;
   opacity: var(--logo-texture);
 }
 .greeting {
@@ -217,13 +217,13 @@ svg { display: block; }
   text-shadow: 0 0 6px var(--bg), 0 0 24px var(--bg);
 }
 
-/* Liquid glass (see .glass), with Dia's layout inside. */
+/* Liquid glass (see .glass). */
 .composer {
   /* A softer top highlight than the other glass: the rim line and the sheen fading down from it. */
   --glass-rim: rgba(255, 255, 255, calc(0.14 * var(--edge, 1)));
   --glass-sheen: rgba(255, 255, 255, 0.04);
-  --dia-text: #ececec;
-  --dia-muted: #8d8d8d;
+  --field-text: #ececec;
+  --field-muted: #8d8d8d;
   position: relative;
   width: min(720px, calc(100vw - 32px));
   box-sizing: border-box;
@@ -248,7 +248,7 @@ svg { display: block; }
     var(--glass-shadow);
 }
 .composer-field { display: flex; align-items: flex-start; gap: 10px; }
-.composer-search { flex: none; margin-top: 4px; color: var(--dia-muted); }
+.composer-search { flex: none; margin-top: 4px; color: var(--field-muted); }
 .composer textarea {
   flex: 1;
   display: block;
@@ -265,10 +265,10 @@ svg { display: block; }
   font-size: 17px;
   font-weight: 400;
   line-height: 1.55;
-  color: var(--dia-text);
-  caret-color: var(--dia-text);
+  color: var(--field-text);
+  caret-color: var(--field-text);
 }
-.composer textarea::placeholder { color: var(--dia-muted); }
+.composer textarea::placeholder { color: var(--field-muted); }
 .composer-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 .tools { display: flex; align-items: center; gap: 10px; }
 .icon-btn[hidden] { display: none; }
@@ -291,7 +291,7 @@ svg { display: block; }
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.pill:hover { background: rgba(255, 255, 255, 0.05); color: var(--dia-text); }
+.pill:hover { background: rgba(255, 255, 255, 0.05); color: var(--field-text); }
 .icon-btn {
   width: 34px;
   height: 34px;
@@ -301,11 +301,11 @@ svg { display: block; }
   display: grid;
   place-items: center;
   background: none;
-  color: var(--dia-muted);
+  color: var(--field-muted);
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
-.icon-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--dia-text); }
+.icon-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--field-text); }
 .pill:focus-visible, .icon-btn:focus-visible, .send:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.35); outline-offset: 2px; }
 .send {
   width: 34px;
@@ -572,6 +572,9 @@ body:has(.tweaks:not(.settings):not([hidden])) .settings-open { right: 312px; }
 .settings-select:disabled { opacity: 0.5; }
 .settings-note { margin: 12px 0 0; font-size: 11px; line-height: 1.4; color: #ffb4b4; }
 .settings-note[hidden] { display: none; }
+.settings-about { margin: 16px 0 0; font: 600 10px/1.4 "Geist Mono", ui-monospace, monospace; letter-spacing: 0.04em; color: var(--muted); }
+.settings-about a { color: var(--text-soft); text-underline-offset: 2px; }
+.settings-about a:hover { color: var(--text); }
 .tweaks input[type="checkbox"]:disabled { opacity: 0.4; cursor: default; }
 
 

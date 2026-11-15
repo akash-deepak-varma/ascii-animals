@@ -31,7 +31,7 @@ Everywhere:
 - whoever leaves downstream comes back in upstream
 - **click** to startle the ones nearby (each animal reacts its own way)
 - the last animal picked is remembered between visits (in `chrome.storage`)
-- a liquid-glass **search box** in the middle (a concept redesign after Dia's AI input, not affiliated with Dia):
+- a liquid-glass **search box** in the middle, with the logo above it as glass:
   type a search and Enter runs it through your browser's default search engine, type an address and it opens that;
   the mic button does voice search where the browser supports it. Above it, a greeting by the time of day;
   the refraction uses an SVG filter in Chromium and falls back to frosted glass elsewhere
@@ -72,9 +72,21 @@ engine.set("density", 2);
 - `settings.ts`, `shortcuts.ts`, `ui.ts`, `panel.ts`, `demo.ts`: the page around the scene: Settings, shortcut tiles, search box and greeting, Tweaks panel, and the startup that ties them together
 - `public/manifest.json`: the extension manifest (Manifest V3; permissions `storage` and `search`, optional `topSites` and `bookmarks`)
 
+## Packaging and sharing
+
+```sh
+npm run package              # build + checks + release/ascii-animals-newtab-v<version>.zip (+ .sha256)
+npm run package -- --store   # same, but refuses while the logo credit is unfinished
+npm run screenshots          # 1280x800 store screenshots + 440x280 promo tile -> release/store/
+npm run logo                 # re-make public/logo.png from assets-src/ (kept out of git)
+```
+
+The manifest's `version` is the source of truth. Friends get the ZIP with `docs/INSTALL-FRIENDS.md`;
+the store gets the same ZIP, with copy-paste text in `docs/store-listing.md` and the policy in `PRIVACY.md`.
+
 ## Before publishing to the Chrome Web Store
 
-- Replace `public/dia-logo.png` (cut from a screenshot of Dia's mark) and the "after Dia" wording above with your own mark: the store rejects other companies' branding.
+- Credit the logo art (see `THIRD_PARTY_NOTICES.md`) in the store description, and replace it if its licence doesn't allow use in a published extension.
 - Replace the generated icons in `public/icons/` (`npm run icons` redraws the defaults) and add store screenshots and a promo tile.
 - The extension collects and sends nothing: settings stay in `chrome.storage` (and Chrome's own sync, if you turn it on). Say so in the privacy policy, and justify `search` (runs your searches), `storage`, and the optional `topSites` and `bookmarks` (the shortcut tiles).
 
