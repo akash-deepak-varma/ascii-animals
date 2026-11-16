@@ -481,14 +481,15 @@ svg { display: block; }
 
 /* ── shortcuts: glass tiles under the search box ──────────────── */
 
+/* A grid of fixed columns: the script reads the column count to decide what goes behind "More". */
 .shortcuts {
   position: absolute;
   top: 100%;
   left: 50%;
   translate: -50% 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 88px);
   justify-content: center;
-  flex-wrap: wrap;
   gap: 10px 8px;
   width: min(720px, calc(100vw - 32px));
   margin-top: 22px;
@@ -501,7 +502,7 @@ svg { display: block; }
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 88px;
+  min-width: 0;
   padding: 12px 6px 10px;
   box-sizing: border-box;
   border: 1px solid var(--glass-edge);
@@ -510,24 +511,128 @@ svg { display: block; }
   -webkit-backdrop-filter: blur(var(--blur, 6px)) saturate(160%);
   backdrop-filter: blur(var(--blur, 6px)) saturate(160%);
   color: var(--text-soft);
+  font: inherit;
   font-size: 12px;
   text-decoration: none;
+  cursor: pointer;
   transition: background 0.2s, color 0.2s, translate 0.2s;
 }
-.shortcut:hover { background: var(--chip-hover); color: var(--text); translate: 0 -2px; }
+.shortcut:hover, .shortcut.open { background: var(--chip-hover); color: var(--text); translate: 0 -2px; }
 .shortcut:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.shortcut-badge {
+.shortcut-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shortcut-cta { grid-column: 1 / -1; justify-self: center; width: 140px; }
+.shortcut-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-soft);
+  text-shadow: 0 0 4px var(--bg), 0 0 10px var(--bg), 0 0 22px var(--bg);
+}
+
+/* The icon plate: the site's own icon on a soft light square, or a coloured letter. */
+.site-icon {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  flex: none;
+  overflow: hidden;
+  color: var(--text);
+  font: 600 14px "Geist Mono", ui-monospace, monospace;
   background: var(--chip);
   border: 1px solid var(--chip-edge);
-  font: 600 13px "Geist Mono", ui-monospace, monospace;
-  color: var(--text);
 }
-.shortcut-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site-icon.tile { width: 36px; height: 36px; border-radius: 11px; }
+.site-icon.row { width: 24px; height: 24px; border-radius: 7px; font-size: 11px; }
+.site-icon.has-img { background: rgba(255, 255, 255, 0.92); border-color: transparent; }
+.site-icon img { width: 70%; height: 70%; object-fit: contain; image-rendering: auto; }
+/* No icon: a letter on a colour taken from the site's name, the same one every time. */
+.site-icon:not(.has-img):not(.folder):not(.more):not(.cta) {
+  background: hsl(var(--hue, 220) 48% 30%);
+  border-color: hsl(var(--hue, 220) 55% 46% / 0.7);
+}
+.site-icon.folder { color: #ffd479; background: rgba(255, 196, 80, 0.12); border-color: rgba(255, 196, 80, 0.3); }
+.site-icon.more, .site-icon.cta { color: var(--text-soft); }
+.badge-wrap { position: relative; display: block; }
+.shortcut-count {
+  position: absolute;
+  right: -6px;
+  bottom: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #1d2030;
+  border: 1px solid var(--chip-edge);
+  font: 600 10px/14px "Geist Mono", ui-monospace, monospace;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+/* ── folder popover ───────────────────────────────────────────── */
+
+.shortcut-pop {
+  position: fixed;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border-radius: 18px;
+  overflow: hidden;
+  --blur: 18px;
+  --tint-a: 0.1;
+  --tint-b: 0.06;
+  background-color: rgba(10, 12, 20, 0.7);
+  font-size: 13px;
+  color: var(--text-soft);
+  animation: pop-in 0.16s ease-out;
+}
+.liquid .shortcut-pop { backdrop-filter: blur(var(--blur)) saturate(180%); }
+@keyframes pop-in { from { opacity: 0; translate: 0 -4px; } }
+.pop-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px 8px; }
+.pop-head h2 { flex: 1; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--text); }
+.pop-open {
+  flex: none;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--chip-edge);
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--text-soft);
+  font-size: 11px;
+  cursor: pointer;
+}
+.pop-open:hover { background: var(--chip-hover); color: var(--text); }
+.pop-list { overflow-y: auto; padding: 2px 6px 8px; overscroll-behavior: contain; scrollbar-width: thin; }
+.pop-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 6px 8px 6px calc(8px + var(--depth, 0) * 18px);
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pop-row:hover, .pop-row:focus-visible { background: var(--chip-hover); color: var(--text); outline: none; }
+.pop-row:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.pop-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pop-host { flex: none; max-width: 38%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: var(--muted); }
+.pop-glyph { display: grid; flex: none; color: #ffd479; }
+.pop-glyph svg { width: 18px; height: 18px; }
+.pop-chevron { display: grid; flex: none; color: var(--muted); transition: rotate 0.15s; }
+.pop-folder[aria-expanded="true"] .pop-chevron { rotate: 90deg; }
+.pop-sub[hidden] { display: none; }
+.pop-empty { margin: 6px 8px 8px; font-size: 12px; color: var(--muted); }
+
 /* Without the search box, the greeting is what's centred. */
 .stage.no-search .masthead { position: static; translate: none; margin-bottom: 0; }
 .stage.no-search .shortcuts { position: static; translate: none; margin: 22px auto 0; }
@@ -590,9 +695,10 @@ body:has(.tweaks:not(.settings):not([hidden])) .settings-open { right: 312px; }
   body:has(.tweaks:not(.settings):not([hidden])) .settings-open { right: 104px; display: none; }
   .settings { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto; max-height: 70vh; }
   .tweaks { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto; max-height: 70vh; }
-  .shortcut { width: 76px; }
+  .shortcuts { grid-template-columns: repeat(auto-fit, 76px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .glass, .choices .thumb, .choices button, .send, .icon-btn, .shortcut { transition: none; }
+  .glass, .choices .thumb, .choices button, .send, .icon-btn, .shortcut, .pop-chevron { transition: none; }
+  .shortcut-pop { animation: none; }
   .icon-btn.listening { animation: none; }
 }

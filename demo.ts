@@ -1,6 +1,6 @@
 import { mountTweakPanel, type Control, type ControlKit } from "./panel";
 import { mountSettings } from "./settings";
-import { renderShortcuts } from "./shortcuts";
+import { mountShortcuts, type Shortcuts } from "./shortcuts";
 import { getSettings, store, type Settings } from "./store";
 import { ANIMAL_KEYS, ANIMALS, AnimalEngine, SHARED_CONTROLS, type AnimalKey, type KnobSpec, type Tuning } from "./src";
 import { mountChoices, mountComposer, mountGreeting } from "./ui";
@@ -121,6 +121,7 @@ async function main() {
   // ── apply settings ──
 
   let shownShortcuts: Settings["shortcuts"] | null = null;
+  let shortcuts: Shortcuts | null = null;
   function applySettings(s: Settings, changed?: keyof Settings | "sync") {
     greeting.hidden = !s.showGreeting;
     composer.hidden = !s.showSearch;
@@ -129,7 +130,8 @@ async function main() {
     refreshGreeting();
     if (shownShortcuts !== s.shortcuts) {
       shownShortcuts = s.shortcuts;
-      void renderShortcuts(shortcutsHost, s.shortcuts);
+      shortcuts?.dispose();
+      shortcuts = s.shortcuts === "off" ? null : mountShortcuts(shortcutsHost, s.shortcuts);
     }
     if (changed === "rotate" || changed === "rotateMinutes" || changed === undefined) restartRotation();
   }

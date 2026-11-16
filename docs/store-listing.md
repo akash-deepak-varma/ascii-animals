@@ -27,7 +27,7 @@ A glass search box sits in the middle: type to search with your default search e
 
 Make it yours (everything below is optional and off until you turn it on):
 • Your name in the greeting
-• Shortcut tiles for your top sites or bookmarks bar
+• Shortcut tiles for your bookmarks (folders open as menus, nothing is cut off) or your top sites, with real site icons
 • A different animal on each new tab, or every few minutes
 • Power saver mode for laptops on battery
 • Sync your choices across devices
@@ -48,7 +48,8 @@ Replaces the New Tab page with an animated ASCII-animal scene and a search box.
 - `storage`: Saves your chosen animal, slider tweaks and settings.
 - `search`: Runs what you type in the new tab's search box through your default search engine.
 - `topSites` (optional): Only if you turn on "Top sites" shortcuts; read locally to draw tiles, never sent anywhere.
-- `bookmarks` (optional): Only if you turn on "Bookmarks bar" shortcuts; read locally to draw tiles, never sent anywhere.
+- `bookmarks` (optional): Only if you turn on "Bookmarks and folders" shortcuts; read locally to draw tiles and folder menus and keep them current, never sent anywhere.
+- `favicon` (optional): Only asked together with the shortcuts permission; shows each site's icon from the browser's own cache on the tiles. Nothing is fetched or sent. Declining shows coloured letters instead.
 - Host permissions: none requested.
 - Remote code: no, all code is in the package.
 

@@ -111,7 +111,16 @@ try {
     // Fresh state each time, then reload with the query string.
     await c.evaluate(`chrome.storage.local.clear().then(()=>chrome.storage.local.set({settings:${JSON.stringify(settings)}}))`);
     if (settings.shortcuts === "bookmarks") {
-      await c.evaluate(`Promise.all([["Wikipedia","https://www.wikipedia.org/"],["GitHub","https://github.com/"],["Maps","https://maps.example.com/"],["News","https://news.example.com/"],["Music","https://music.example.com/"],["Mail","https://mail.example.com/"]].map(([title,url])=>chrome.bookmarks.create({parentId:"1",title,url})))`);
+      await c.evaluate(`(async()=>{
+        const mk=(parentId,title,url)=>chrome.bookmarks.create(url?{parentId,title,url}:{parentId,title});
+        for (const [t,u] of [["Wikipedia","https://www.wikipedia.org/"],["GitHub","https://github.com/"],["Maps","https://maps.example.com/"],["Mail","https://mail.example.com/"],["Music","https://music.example.com/"]]) await mk("1",t,u);
+        const reading=await mk("1","Reading");
+        for (const [t,u] of [["Daily news","https://news.example.com/"],["Long reads","https://longreads.example.com/"],["Science","https://science.example.com/"],["Recipes","https://recipes.example.com/"]]) await mk(reading.id,t,u);
+        const sub=await mk(reading.id,"Saved for later");
+        for (const [t,u] of [["Design notes","https://design.example.com/"],["Travel plans","https://travel.example.com/"]]) await mk(sub.id,t,u);
+        const work=await mk("1","Work");
+        for (const [t,u] of [["Calendar","https://calendar.example.com/"],["Docs","https://docs.example.com/"],["Tasks","https://tasks.example.com/"]]) await mk(work.id,t,u);
+      })()`);
     }
     await c.send("Page.navigate", { url: `chrome-extension://${extId}/index.html${query}` });
     await sleep(wait);
@@ -131,9 +140,13 @@ try {
   await shoot("1-butterflies-1280x800.png", { query: "?animal=butterflies", settings: clean });
   await shoot("2-koi-1280x800.png", { query: "?animal=koi", settings: clean });
   await shoot("3-jellyfish-1280x800.png", { query: "?animal=jellyfish", settings: clean });
-  await shoot("4-cranes-1280x800.png", { query: "?animal=cranes", settings: clean });
-  await shoot("5-shortcuts-and-settings-1280x800.png", {
+  await shoot("4-bookmark-folders-1280x800.png", {
     query: "?animal=dragonflies",
+    settings: { ...clean, shortcuts: "bookmarks", name: "Sam" },
+    run: "[...document.querySelectorAll('.shortcut-folder')].find((t) => t.textContent.includes('Reading')).click(); [...document.querySelectorAll('.pop-folder')][0]?.click()",
+  });
+  await shoot("5-settings-1280x800.png", {
+    query: "?animal=cranes",
     settings: { ...clean, shortcuts: "bookmarks", name: "Sam" },
     run: "document.querySelector('.settings-open').click()",
   });

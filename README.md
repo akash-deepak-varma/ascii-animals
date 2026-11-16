@@ -44,7 +44,7 @@ Optional extras, all off until you turn them on in **Settings** (the gear, top r
 |---|---|
 | Name | adds your name to the greeting ("Good morning, Sam"); empty leaves it out |
 | Show greeting / search box | hide either one |
-| Shortcuts | a row of tiles under the search box: your top sites or your bookmarks bar. Chrome asks for permission only when you pick one |
+| Shortcuts | a row of tiles under the search box: your bookmarks (with site icons; folders open as menus, nested folders too; whatever doesn't fit sits behind a **More** tile; it updates as you add or change bookmarks) or your top sites. Chrome asks for permission, once, only when you pick one |
 | Auto-rotate | a different animal on each new tab, or every few minutes |
 | Power saver | 30 fps at standard resolution, lighter on battery and CPU |
 | Sync across devices | keeps your animal, tweaks and settings the same on every Chrome you're signed in to (`chrome.storage.sync`) |

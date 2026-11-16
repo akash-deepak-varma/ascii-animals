@@ -40,7 +40,11 @@ Tick off what you can, and tell me what felt wrong, slow, ugly or confusing.
 - [ ] Type a search and press Enter (should use your normal search engine). Type an address like `example.com`.
 - [ ] Open **Tweaks** (top right) and drag a few sliders. Close and reopen the tab: is your choice remembered?
 - [ ] Open **Settings** (the gear). Try: your name in the greeting, hiding the greeting, **Power saver**.
-- [ ] **Shortcuts**: choose *Top sites* or *Bookmarks bar*. Your browser should ask permission first. Do the tiles show up?
+- [ ] **Shortcuts**: choose *Bookmarks and folders* (or *Top sites*). Your browser should ask permission first, once, for bookmarks and site icons together.
+  - [ ] Do your bookmarks show with the right site icons? Do your **folders** show, and open a menu with what is inside (including folders inside folders)?
+  - [ ] If you have more bookmarks than fit, is there a **More** tile that lists the rest?
+  - [ ] Add, rename or delete a bookmark in another tab: does the row update without a reload?
+  - [ ] If you say **no** to the prompt, does an *Allow bookmarks* tile appear, and does it work when you click it?
 - [ ] **Auto-rotate**: try *Each new tab*.
 - [ ] **Sync across devices** (only if you are signed in to the browser).
 - [ ] Make the window very small and very large.

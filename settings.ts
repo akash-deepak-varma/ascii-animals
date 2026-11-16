@@ -117,12 +117,12 @@ export function mountSettings({ onChange }: Hooks) {
   const links = section("Shortcuts");
   choice(
     links,
-    "Under the search box",
+    "Shortcuts row",
     "shortcuts",
-    [["off", "Off"], ["topSites", "Top sites"], ["bookmarks", "Bookmarks bar"]],
+    [["off", "Off"], ["topSites", "Top sites"], ["bookmarks", "Bookmarks and folders"]],
     async (value) => {
       if (await requestShortcuts(value)) return true;
-      say("Chrome didn't grant access, so shortcuts stay off.");
+      say("Access wasn't granted, so shortcuts stay off. Pick it again to be asked once more.");
       return false;
     },
   );
